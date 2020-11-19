@@ -11,40 +11,43 @@ const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 600;
 
 const drawLine = ({ width, height, dataset }) => {
-  const getNewAxis = (cx) => select("#chart").append("g").attr("class", cx);
+  const g = (cx) => {
+    const group = select(`.${cx}`);
+    return group.empty()
+      ? select("#chart").append("g").attr("class", cx)
+      : group;
+  };
 
-  const scaleY = scaleLinear()
+  const y = scaleLinear()
     .domain([0, max(dataset.map((it) => it.value)) * 1.1])
     .range([height - Y_MARGIN, Y_MARGIN]);
 
-  const scaleX = scaleTime()
+  const x = scaleTime()
     .domain([dataset[dataset.length - 1].date, dataset[0].date])
     .range([X_MARGIN, width - X_MARGIN]);
 
-  const yAx = select(".y-axis");
-  const xAx = select(".x-axis");
+  const yAxis = axisLeft().scale(y);
+  const xAxis = axisBottom().scale(x);
 
-  const YAxis = axisLeft().scale(scaleY);
-  const XAxis = axisBottom().scale(scaleX);
-
-  (yAx.empty() ? getNewAxis("y-axis") : yAx)
+  g("y-axis")
     .transition()
     .attr("transform", `translate(${X_MARGIN}, ${0})`)
-    .call(YAxis);
-  (xAx.empty() ? getNewAxis("x-axis") : xAx)
+    .call(yAxis);
+  g("x-axis")
     .attr("transform", `translate(${0}, ${height - Y_MARGIN})`)
-    .call(XAxis);
+    .call(xAxis);
 
-  const daily = select(".daily");
-  (daily.empty() ? select("#chart").append("g").attr("class", "daily") : daily)
+  const bandWidth = (width - 2*X_MARGIN)/dataset.length;
+  g("daily")
     .attr("fill", "steelblue")
-    .selectAll("circle")
+    .selectAll("rect")
     .data(dataset)
-    .join("circle")
+    .join("rect")
     .transition()
-    .attr("r", "2")
-    .attr("cx", (d) => scaleX(d.date))
-    .attr("cy", (d) => scaleY(d.value));
+    .attr("x", (d) => x(d.date))
+    .attr("y", (d) => y(d.value))
+    .attr("height", (d) => y(0) - y(d.value))
+    .attr("width", bandWidth);
 };
 
 export default function Home({ dataset }) {
