@@ -1,15 +1,7 @@
 import Head from "next/head";
 
 import { useEffect, useState, useReducer } from "react";
-import {
-  select,
-  axisBottom,
-  axisLeft,
-  max,
-  min,
-  line,
-  curveCardinal,
-} from "d3";
+import { select, axisBottom, axisLeft, max } from "d3";
 import { scaleLinear, scaleTime } from "d3-scale";
 
 const X_MARGIN = 50;
@@ -43,7 +35,8 @@ const drawLine = ({ width, height, dataset }) => {
     .attr("transform", `translate(${0}, ${height - Y_MARGIN})`)
     .call(XAxis);
 
-  select("#chart")
+  const daily = select(".daily");
+  (daily.empty() ? select("#chart").append("g").attr("class", "daily") : daily)
     .attr("fill", "steelblue")
     .selectAll("circle")
     .data(dataset)
