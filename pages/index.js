@@ -1,10 +1,11 @@
 import Head from "next/head";
 
 import { useEffect, useState, useReducer } from "react";
+import useMeasure from "react-use-measure";
 import { select, axisBottom, axisLeft, max } from "d3";
 import { scaleLinear, scaleTime } from "d3-scale";
 
-const X_MARGIN = 50;
+const X_MARGIN = 60;
 const Y_MARGIN = 50;
 
 const DEFAULT_WIDTH = 800;
@@ -37,7 +38,7 @@ const drawLine = ({ width, height, dataset }) => {
     .attr("transform", `translate(${0}, ${height - Y_MARGIN})`)
     .call(xAxis);
 
-  const bandWidth = (width - 2*X_MARGIN)/dataset.length;
+  const bandWidth = (width - 2 * X_MARGIN) / dataset.length;
   g("daily")
     .attr("fill", "steelblue")
     .selectAll("rect")
@@ -50,9 +51,39 @@ const drawLine = ({ width, height, dataset }) => {
     .attr("width", bandWidth);
 };
 
+function Details(props) {
+  return (
+    <div>
+      <p>{new Date(props.dateChecked).toDateString()}</p>
+
+      <p>Daily Tests: {props.totalTestResultsIncrease}</p>
+      <p>Daily Cases: {props.positiveIncrease}</p>
+      <p>Currently Hospitalized: {props.hospitalizedCurrently}</p>
+      <p>Currently in ICU: {props.inIcuCurrently}</p>
+      <p>Currently on Ventilator: {props.onVentilatorCurrently}</p>
+      <p>Daily Deaths: {props.deathIncrease}</p>
+
+      <p>Total Tests: {props.totalTestResults}</p>
+      <p>Total Cases: {props.positive}</p>
+      <p>Total Hospitalizations: {props.hospitalized}</p>
+      <p>Total in ICU: {props.inIcuCumulative}</p>
+      <p>Total on Ventilator: {props.onVentilatorCumulative}</p>
+      <p>Total Deaths: {props.death}</p>
+      <p>Recovered: {props.recovered}</p>
+    </div>
+  );
+}
+
+const dateFormat = (dateStr) => {
+  const date = new Date(dateStr);
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+};
+
 export default function Home({ dataset }) {
   const [width] = useState(DEFAULT_WIDTH);
   const [height] = useState(DEFAULT_HEIGHT);
+
+  const [current, setCurrent] = useState(dataset[0]);
 
   const initialState = {
     field: "positiveIncrease",
@@ -66,6 +97,10 @@ export default function Home({ dataset }) {
         return { ...state, field: "deathIncrease" };
       case "hospitalized":
         return { ...state, field: "hospitalizedCurrently" };
+      case "in_ICU":
+        return { ...state, field: "inIcuCurrently" };
+      case "on_ventilator":
+        return { ...state, field: "onVentilatorCurrently" };
       case "daily_tests":
         return { ...state, field: "totalTestResultsIncrease" };
       default:
@@ -77,16 +112,13 @@ export default function Home({ dataset }) {
 
   useEffect(() => {
     const data = dataset.map((entry) => ({
-      date: new Date(
-        String(entry.date)
-          .match(/(\d{4})(\d{2})(\d{2})/)
-          .slice(1, 4)
-          .join("-")
-      ),
+      date: new Date(entry.dateChecked),
       value: entry[state.field],
     }));
     drawLine({ dataset: data, width, height });
   }, [dataset, width, height, state]);
+
+  const [ref, bounds] = useMeasure();
 
   return (
     <div>
@@ -97,24 +129,37 @@ export default function Home({ dataset }) {
 
       <main>
         <div className="min-w-screen min-h-screen bg-gray-100 flex flex-wrap content-around justify-center px-5 py-5">
-          <div className="bg-white text-grey-800 rounded shadow-xl py-5 px-5 w-full lg:w-10/12 xl:w-3/4">
-            <div className="flex justify-between">
-              <button onClick={() => dispatch({ type: "daily_tests" })}>
-                Daily Tests
-              </button>
-              <button onClick={() => dispatch({ type: "daily_cases" })}>
-                Daily Cases
-              </button>
-              <button onClick={() => dispatch({ type: "hospitalized" })}>
-                Currently Hospitalized
-              </button>
-              <button onClick={() => dispatch({ type: "daily_death" })}>
-                Daily Deaths
-              </button>
+          <div className="bg-white text-grey-800 rounded shadow-xl py-5 px-5 w-full lg:w-10/12 xl:w-3/4 flex">
+            <div className="flex flex-col">
+              <div className="flex justify-between px-12">
+                <button onClick={() => dispatch({ type: "daily_tests" })}>
+                  Daily Tests
+                </button>
+                <button onClick={() => dispatch({ type: "daily_cases" })}>
+                  Daily Cases
+                </button>
+                <button onClick={() => dispatch({ type: "hospitalized" })}>
+                  Hospitalized
+                </button>
+                <button onClick={() => dispatch({ type: "in_ICU" })}>
+                  in ICU
+                </button>
+                <button onClick={() => dispatch({ type: "on_ventilator" })}>
+                  on Ventilator
+                </button>
+                <button onClick={() => dispatch({ type: "daily_death" })}>
+                  Daily Deaths
+                </button>
+              </div>
+              <div className="flex items-end" ref={ref}>
+                <svg width={width} height={height} id="chart" />
+              </div>
+              <div className="flex justify-center">
+                {dateFormat(dataset[dataset.length - 1].dateChecked)} -{" "}
+                {dateFormat(dataset[0].dateChecked)}
+              </div>
             </div>
-            <div className="flex items-end">
-              <svg width={width} height={height} id="chart" />
-            </div>
+            <Details {...current} />
           </div>
         </div>
       </main>
