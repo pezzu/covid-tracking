@@ -5,13 +5,11 @@ import useMeasure from "react-use-measure";
 import { select, axisBottom, axisLeft, max } from "d3";
 import { scaleLinear, scaleTime } from "d3-scale";
 
-const X_MARGIN = 60;
-const Y_MARGIN = 50;
-
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 600;
 
 const drawLine = ({ width, height, dataset }) => {
+  const margin = { left: 60, right: 30, top: 30, bottom: 30 };
   const g = (cx) => {
     const group = select(`.${cx}`);
     return group.empty()
@@ -21,24 +19,24 @@ const drawLine = ({ width, height, dataset }) => {
 
   const y = scaleLinear()
     .domain([0, max(dataset.map((it) => it.value)) * 1.1])
-    .range([height - Y_MARGIN, Y_MARGIN]);
+    .range([height - margin.top, margin.bottom]);
 
   const x = scaleTime()
     .domain([dataset[dataset.length - 1].date, dataset[0].date])
-    .range([X_MARGIN, width - X_MARGIN]);
+    .range([margin.left, width - margin.right]);
 
   const yAxis = axisLeft().scale(y);
   const xAxis = axisBottom().scale(x);
 
   g("y-axis")
     .transition()
-    .attr("transform", `translate(${X_MARGIN}, ${0})`)
+    .attr("transform", `translate(${margin.left}, ${0})`)
     .call(yAxis);
   g("x-axis")
-    .attr("transform", `translate(${0}, ${height - Y_MARGIN})`)
+    .attr("transform", `translate(${0}, ${height - margin.top})`)
     .call(xAxis);
 
-  const bandWidth = (width - 2 * X_MARGIN) / dataset.length;
+  const bandWidth = (width - margin.left - margin.right) / dataset.length;
   g("daily")
     .attr("fill", "steelblue")
     .selectAll("rect")
@@ -53,35 +51,75 @@ const drawLine = ({ width, height, dataset }) => {
 
 function Details(props) {
   return (
-    <div>
-      <p>{new Date(props.dateChecked).toDateString()}</p>
+    <div className="p-2">
+      <p className="text-center font-semibold text-lg mb-3">
+        {new Date(props.dateChecked).toDateString()}
+      </p>
 
-      <p>Daily Tests: {props.totalTestResultsIncrease}</p>
-      <p>Daily Cases: {props.positiveIncrease}</p>
-      <p>Currently Hospitalized: {props.hospitalizedCurrently}</p>
-      <p>Currently in ICU: {props.inIcuCurrently}</p>
-      <p>Currently on Ventilator: {props.onVentilatorCurrently}</p>
-      <p>Daily Deaths: {props.deathIncrease}</p>
+      <p className="border-gray-400 border-b-2 font-semibold mt-4 mb-2">
+        On this day
+      </p>
+      <div className="pl-5">
+        <div className="flex justify-between">
+          <p>Tests Performed:</p> <p>{props.totalTestResultsIncrease}</p>
+        </div>
+        <div className="flex justify-between">
+          <p>Positive Cases:</p> <p>{props.positiveIncrease}</p>
+        </div>
+        <div className="flex justify-between">
+          <p>Currently Hospitalized:</p> <p>{props.hospitalizedCurrently}</p>
+        </div>
+        <div className="flex justify-between">
+          <p>Currently in ICU:</p> <p>{props.inIcuCurrently}</p>
+        </div>
+        <div className="flex justify-between">
+          <p>Currently on Ventilator:</p> <p>{props.onVentilatorCurrently}</p>
+        </div>
+        <div className="flex justify-between">
+          <p>Deaths Increase:</p> <p>{props.deathIncrease}</p>
+        </div>
+      </div>
 
-      <p>Total Tests: {props.totalTestResults}</p>
-      <p>Total Cases: {props.positive}</p>
-      <p>Total Hospitalizations: {props.hospitalized}</p>
-      <p>Total in ICU: {props.inIcuCumulative}</p>
-      <p>Total on Ventilator: {props.onVentilatorCumulative}</p>
-      <p>Total Deaths: {props.death}</p>
-      <p>Recovered: {props.recovered}</p>
+      <p className="border-gray-400 border-b-2 font-semibold mt-4 mb-2">
+        By this day cumulative
+      </p>
+      <div className="pl-5">
+        <div className="flex justify-between">
+          <p>Tests Performed:</p> <p>{props.totalTestResults}</p>
+        </div>
+        <div className="flex justify-between">
+          <p>Positive Cases:</p> <p>{props.positive}</p>
+        </div>
+        <div className="flex justify-between">
+          <p>Hospitalized:</p> <p>{props.hospitalized}</p>
+        </div>
+        <div className="flex justify-between">
+          <p>in ICU:</p> <p>{props.inIcuCumulative}</p>
+        </div>
+        <div className="flex justify-between">
+          <p>on Ventilator:</p> <p>{props.onVentilatorCumulative}</p>
+        </div>
+        <div className="flex justify-between">
+          <p>Total Deaths:</p> <p>{props.death}</p>
+        </div>
+        <div className="flex justify-between">
+          <p>Total Recovered:</p> <p>{props.recovered}</p>
+        </div>
+      </div>
     </div>
   );
 }
 
 const dateFormat = (dateStr) => {
   const date = new Date(dateStr);
-  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+  return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 };
 
 export default function Home({ dataset }) {
-  const [width] = useState(DEFAULT_WIDTH);
+  const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [height] = useState(DEFAULT_HEIGHT);
+
+  const [ref, bounds] = useMeasure();
 
   const [current, setCurrent] = useState(dataset[0]);
 
@@ -118,7 +156,9 @@ export default function Home({ dataset }) {
     drawLine({ dataset: data, width, height });
   }, [dataset, width, height, state]);
 
-  const [ref, bounds] = useMeasure();
+  useEffect(() => {
+    setWidth(bounds.width);
+  }, [bounds]);
 
   return (
     <div>
@@ -128,38 +168,45 @@ export default function Home({ dataset }) {
       </Head>
 
       <main>
-        <div className="min-w-screen min-h-screen bg-gray-100 flex flex-wrap content-around justify-center px-5 py-5">
-          <div className="bg-white text-grey-800 rounded shadow-xl py-5 px-5 w-full lg:w-10/12 xl:w-3/4 flex">
-            <div className="flex flex-col">
-              <div className="flex justify-between px-12">
-                <button onClick={() => dispatch({ type: "daily_tests" })}>
-                  Daily Tests
-                </button>
-                <button onClick={() => dispatch({ type: "daily_cases" })}>
-                  Daily Cases
-                </button>
-                <button onClick={() => dispatch({ type: "hospitalized" })}>
-                  Hospitalized
-                </button>
-                <button onClick={() => dispatch({ type: "in_ICU" })}>
-                  in ICU
-                </button>
-                <button onClick={() => dispatch({ type: "on_ventilator" })}>
-                  on Ventilator
-                </button>
-                <button onClick={() => dispatch({ type: "daily_death" })}>
-                  Daily Deaths
-                </button>
+        <div className="min-w-screen min-h-screen bg-gray-100 text-gray-900 flex flex-wrap content-around justify-center px-3 py-3">
+          <div className="bg-white text-grey-800 rounded shadow-xl py-3 px-3 w-full lg:w-10/12 xl:w-3/4">
+            <h1 className="text-center font-semibold text-3xl m-5">
+              COVID-19 in the United States
+            </h1>
+            <div className="flex">
+              <div className="flex flex-col w-3/4">
+                <div className="flex justify-around">
+                  <button onClick={() => dispatch({ type: "daily_tests" })}>
+                    Daily Tests
+                  </button>
+                  <button onClick={() => dispatch({ type: "daily_cases" })}>
+                    Daily Cases
+                  </button>
+                  <button onClick={() => dispatch({ type: "hospitalized" })}>
+                    Hospitalized
+                  </button>
+                  <button onClick={() => dispatch({ type: "in_ICU" })}>
+                    in ICU
+                  </button>
+                  <button onClick={() => dispatch({ type: "on_ventilator" })}>
+                    on Ventilator
+                  </button>
+                  <button onClick={() => dispatch({ type: "daily_death" })}>
+                    Daily Deaths
+                  </button>
+                </div>
+                <div ref={ref}>
+                  <svg width={width} height={height} id="chart" />
+                </div>
+                <div className="text-center text-xl">
+                  {dateFormat(dataset[dataset.length - 1].dateChecked)} -{" "}
+                  {dateFormat(dataset[0].dateChecked)}
+                </div>
               </div>
-              <div className="flex items-end" ref={ref}>
-                <svg width={width} height={height} id="chart" />
-              </div>
-              <div className="flex justify-center">
-                {dateFormat(dataset[dataset.length - 1].dateChecked)} -{" "}
-                {dateFormat(dataset[0].dateChecked)}
+              <div className="w-1/4 px-5">
+                <Details {...current} />
               </div>
             </div>
-            <Details {...current} />
           </div>
         </div>
       </main>
