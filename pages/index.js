@@ -9,7 +9,7 @@ const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 600;
 
 const drawLine = ({ width, height, dataset }) => {
-  const margin = { left: 60, right: 30, top: 30, bottom: 30 };
+  const margin = { left: 60, right: 20, top: 30, bottom: 30 };
   const g = (cx) => {
     const group = select(`.${cx}`);
     return group.empty()
@@ -51,59 +51,67 @@ const drawLine = ({ width, height, dataset }) => {
 
 function Details(props) {
   return (
-    <div className="p-2">
-      <p className="text-center font-semibold text-lg mb-3">
+    <div>
+      <p className="text-center font-semibold text-lg mb-2">
         {new Date(props.dateChecked).toDateString()}
       </p>
 
-      <p className="border-gray-400 border-b-2 font-semibold mt-4 mb-2">
-        On this day
-      </p>
-      <div className="pl-5">
-        <div className="flex justify-between">
-          <p>Tests Performed:</p> <p>{props.totalTestResultsIncrease}</p>
+      <div className="flex flex-col md:flex-row lg:flex-col px-2">
+        <div className="md:w-1/2 lg:w-full px-2">
+          <p className="border-gray-400 border-b-2 font-semibold mt-4 mb-2 text-right">
+            On this day
+          </p>
+          <div>
+            <div className="flex justify-between">
+              <p>Tests Performed:</p> <p>{props.totalTestResultsIncrease}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>Positive Cases:</p> <p>{props.positiveIncrease}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>Currently Hospitalized:</p>{" "}
+              <p>{props.hospitalizedCurrently}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>Currently in ICU:</p> <p>{props.inIcuCurrently}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>Currently on Ventilator:</p>{" "}
+              <p>{props.onVentilatorCurrently}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>Deaths Increase:</p> <p>{props.deathIncrease}</p>
+            </div>
+          </div>
         </div>
-        <div className="flex justify-between">
-          <p>Positive Cases:</p> <p>{props.positiveIncrease}</p>
-        </div>
-        <div className="flex justify-between">
-          <p>Currently Hospitalized:</p> <p>{props.hospitalizedCurrently}</p>
-        </div>
-        <div className="flex justify-between">
-          <p>Currently in ICU:</p> <p>{props.inIcuCurrently}</p>
-        </div>
-        <div className="flex justify-between">
-          <p>Currently on Ventilator:</p> <p>{props.onVentilatorCurrently}</p>
-        </div>
-        <div className="flex justify-between">
-          <p>Deaths Increase:</p> <p>{props.deathIncrease}</p>
-        </div>
-      </div>
 
-      <p className="border-gray-400 border-b-2 font-semibold mt-4 mb-2">
-        By this day cumulative
-      </p>
-      <div className="pl-5">
-        <div className="flex justify-between">
-          <p>Tests Performed:</p> <p>{props.totalTestResults}</p>
-        </div>
-        <div className="flex justify-between">
-          <p>Positive Cases:</p> <p>{props.positive}</p>
-        </div>
-        <div className="flex justify-between">
-          <p>Hospitalized:</p> <p>{props.hospitalized}</p>
-        </div>
-        <div className="flex justify-between">
-          <p>in ICU:</p> <p>{props.inIcuCumulative}</p>
-        </div>
-        <div className="flex justify-between">
-          <p>on Ventilator:</p> <p>{props.onVentilatorCumulative}</p>
-        </div>
-        <div className="flex justify-between">
-          <p>Total Deaths:</p> <p>{props.death}</p>
-        </div>
-        <div className="flex justify-between">
-          <p>Total Recovered:</p> <p>{props.recovered}</p>
+        <div className="md:w-1/2 lg:w-full px-2">
+          <p className="border-gray-400 border-b-2 font-semibold mt-4 mb-2 text-right">
+            By this day cumulative
+          </p>
+          <div>
+            <div className="flex justify-between">
+              <p>Tests Performed:</p> <p>{props.totalTestResults}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>Positive Cases:</p> <p>{props.positive}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>Hospitalized:</p> <p>{props.hospitalized}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>in ICU:</p> <p>{props.inIcuCumulative}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>on Ventilator:</p> <p>{props.onVentilatorCumulative}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>Total Deaths:</p> <p>{props.death}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>Total Recovered:</p> <p>{props.recovered}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -169,33 +177,51 @@ export default function Home({ dataset }) {
 
       <main>
         <div className="min-w-screen min-h-screen bg-gray-100 text-gray-900 flex flex-wrap content-around justify-center px-3 py-3">
-          <div className="bg-white text-grey-800 rounded shadow-xl py-3 px-3 w-full lg:w-10/12 xl:w-3/4">
-            <h1 className="text-center font-semibold text-3xl m-5">
+          <div className="bg-white text-grey-800 rounded shadow-xl py-3 px-3 w-full xl:max-w-6xl">
+            <h1 className="text-center font-semibold text-3xl mb-5 mx-2">
               COVID-19 in the United States
             </h1>
-            <div className="flex">
-              <div className="flex flex-col w-3/4">
-                <div className="flex justify-around">
-                  <button onClick={() => dispatch({ type: "daily_tests" })}>
+            <div className="flex flex-col lg:flex-row">
+              <div className="flex flex-col lg:w-3/4">
+                <div className="flex justify-around flex-wrap">
+                  <button
+                    className="w-1/3 md:w-1/6"
+                    onClick={() => dispatch({ type: "daily_tests" })}
+                  >
                     Daily Tests
                   </button>
-                  <button onClick={() => dispatch({ type: "daily_cases" })}>
+                  <button
+                    className="w-1/3 md:w-1/6"
+                    onClick={() => dispatch({ type: "daily_cases" })}
+                  >
                     Daily Cases
                   </button>
-                  <button onClick={() => dispatch({ type: "hospitalized" })}>
+                  <button
+                    className="w-1/3 md:w-1/6"
+                    onClick={() => dispatch({ type: "hospitalized" })}
+                  >
                     Hospitalized
                   </button>
-                  <button onClick={() => dispatch({ type: "in_ICU" })}>
+                  <button
+                    className="w-1/3 md:w-1/6"
+                    onClick={() => dispatch({ type: "in_ICU" })}
+                  >
                     in ICU
                   </button>
-                  <button onClick={() => dispatch({ type: "on_ventilator" })}>
+                  <button
+                    className="w-1/3 md:w-1/6"
+                    onClick={() => dispatch({ type: "on_ventilator" })}
+                  >
                     on Ventilator
                   </button>
-                  <button onClick={() => dispatch({ type: "daily_death" })}>
+                  <button
+                    className="w-1/3 md:w-1/6"
+                    onClick={() => dispatch({ type: "daily_death" })}
+                  >
                     Daily Deaths
                   </button>
                 </div>
-                <div ref={ref}>
+                <div className="" ref={ref}>
                   <svg width={width} height={height} id="chart" />
                 </div>
                 <div className="text-center text-xl">
@@ -203,7 +229,7 @@ export default function Home({ dataset }) {
                   {dateFormat(dataset[0].dateChecked)}
                 </div>
               </div>
-              <div className="w-1/4 px-5">
+              <div className="lg:w-1/4 lg:pl-3 mt-5">
                 <Details {...current} />
               </div>
             </div>
