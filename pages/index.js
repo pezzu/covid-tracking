@@ -2,7 +2,7 @@ import Head from "next/head";
 
 import { useEffect, useState, useReducer } from "react";
 import useMeasure from "react-use-measure";
-import { select, axisBottom, axisLeft, max } from "d3";
+import { select, axisBottom, axisLeft, max, line, curveCardinal } from "d3";
 import { scaleLinear, scaleTime } from "d3-scale";
 
 const DEFAULT_WIDTH = 800;
@@ -10,12 +10,16 @@ const DEFAULT_HEIGHT = 600;
 
 const drawLine = ({ width, height, dataset }) => {
   const margin = { left: 60, right: 20, top: 30, bottom: 30 };
-  const g = (cx) => {
-    const group = select(`.${cx}`);
-    return group.empty()
-      ? select("#chart").append("g").attr("class", cx)
-      : group;
+
+  const element = (type, className) => {
+    const elem = select(`.${className}`);
+    return elem.empty()
+      ? select("#chart").append(type).attr("class", className)
+      : elem;
   };
+
+  const g = (cx) => element("g", cx);
+  const path = (cx) => element("path", cx);
 
   const y = scaleLinear()
     .domain([0, max(dataset.map((it) => it.value)) * 1.1])
@@ -39,6 +43,7 @@ const drawLine = ({ width, height, dataset }) => {
   const bandWidth = (width - margin.left - margin.right) / dataset.length;
   g("daily")
     .attr("fill", "steelblue")
+    .attr("opacity", "0.4")
     .selectAll("rect")
     .data(dataset)
     .join("rect")
@@ -47,6 +52,19 @@ const drawLine = ({ width, height, dataset }) => {
     .attr("y", (d) => y(d.value))
     .attr("height", (d) => y(0) - y(d.value))
     .attr("width", bandWidth);
+
+  const chartline = line()
+    .curve(curveCardinal)
+    .x((d) => x(d.date))
+    .y((d) => y(d.avg7));
+
+  path("average7")
+    .datum(dataset)
+    .attr("stroke", "steelblue")
+    .attr("stroke-width", "3")
+    .attr("fill", "none")
+    .transition()
+    .attr("d", chartline);
 };
 
 function Details(props) {
@@ -131,38 +149,49 @@ export default function Home({ dataset }) {
 
   const [current, setCurrent] = useState(dataset[0]);
 
+  const selectCriteria = (field) =>
+    dataset.map((d, i) => {
+      let avg7 = dataset
+        .slice(i, Math.min(i + 7, dataset.length))
+        .reduce((a, c) => a + c[field], 0) / 7;
+      if (i > dataset.length - 7) {
+        avg7 += (dataset[dataset.length - 1][field] * (i - dataset.length + 7)) / 7;
+      }
+      return {
+        date: new Date(d.dateChecked),
+        value: d[field],
+        avg7,
+      };
+    });
+
   const initialState = {
-    field: "positiveIncrease",
+    data: selectCriteria("positiveIncrease"),
   };
 
-  const fieldReducer = (state, action) => {
+  const criteriaReducer = (state, action) => {
     switch (action.type) {
       case "daily_cases":
-        return { ...state, field: "positiveIncrease" };
+        return { data: selectCriteria("positiveIncrease") };
       case "daily_death":
-        return { ...state, field: "deathIncrease" };
+        return { data: selectCriteria("deathIncrease") };
       case "hospitalized":
-        return { ...state, field: "hospitalizedCurrently" };
+        return { data: selectCriteria("hospitalizedCurrently") };
       case "in_ICU":
-        return { ...state, field: "inIcuCurrently" };
+        return { data: selectCriteria("inIcuCurrently") };
       case "on_ventilator":
-        return { ...state, field: "onVentilatorCurrently" };
+        return { data: selectCriteria("onVentilatorCurrently") };
       case "daily_tests":
-        return { ...state, field: "totalTestResultsIncrease" };
+        return { data: selectCriteria("totalTestResultsIncrease") };
       default:
         throw new Error("Unexpected action", action);
     }
   };
 
-  const [state, dispatch] = useReducer(fieldReducer, initialState);
+  const [state, dispatch] = useReducer(criteriaReducer, initialState);
 
   useEffect(() => {
-    const data = dataset.map((entry) => ({
-      date: new Date(entry.dateChecked),
-      value: entry[state.field],
-    }));
-    drawLine({ dataset: data, width, height });
-  }, [dataset, width, height, state]);
+    drawLine({ dataset: state.data, width, height });
+  }, [width, height, state]);
 
   useEffect(() => {
     setWidth(bounds.width);
