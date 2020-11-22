@@ -1,9 +1,9 @@
 import Head from "next/head";
-
 import { useEffect, useState, useReducer } from "react";
 import useMeasure from "react-use-measure";
 import { select, axisBottom, axisLeft, max, line, curveCardinal } from "d3";
 import { scaleLinear, scaleTime } from "d3-scale";
+import classnames from "classnames";
 
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 600;
@@ -141,6 +141,31 @@ const dateFormat = (dateStr) => {
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 };
 
+const CriteriaSwitch = ({ text, field, dispatch, state }) => {
+  return (
+    <div className="p-1 w-1/3 md:w-1/6">
+      <button
+        className={classnames(
+          "w-full",
+          "border",
+          "rounded-lg",
+          "border-gray-800",
+          "font-semibold",
+          "hover:bg-gray-500",
+          "hover:text-white",
+          {
+            "text-white": state.field === field,
+            "bg-gray-800": state.field === field,
+          }
+        )}
+        onClick={() => dispatch({ type: field })}
+      >
+        {text}
+      </button>
+    </div>
+  );
+};
+
 export default function Home({ dataset }) {
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [height] = useState(DEFAULT_HEIGHT);
@@ -151,11 +176,13 @@ export default function Home({ dataset }) {
 
   const selectCriteria = (field) =>
     dataset.map((d, i) => {
-      let avg7 = dataset
-        .slice(i, Math.min(i + 7, dataset.length))
-        .reduce((a, c) => a + c[field], 0) / 7;
+      let avg7 =
+        dataset
+          .slice(i, Math.min(i + 7, dataset.length))
+          .reduce((a, c) => a + c[field], 0) / 7;
       if (i > dataset.length - 7) {
-        avg7 += (dataset[dataset.length - 1][field] * (i - dataset.length + 7)) / 7;
+        avg7 +=
+          (dataset[dataset.length - 1][field] * (i - dataset.length + 7)) / 7;
       }
       return {
         date: new Date(d.dateChecked),
@@ -165,23 +192,42 @@ export default function Home({ dataset }) {
     });
 
   const initialState = {
+    field: "positiveIncrease",
     data: selectCriteria("positiveIncrease"),
   };
 
   const criteriaReducer = (state, action) => {
     switch (action.type) {
-      case "daily_cases":
-        return { data: selectCriteria("positiveIncrease") };
-      case "daily_death":
-        return { data: selectCriteria("deathIncrease") };
-      case "hospitalized":
-        return { data: selectCriteria("hospitalizedCurrently") };
-      case "in_ICU":
-        return { data: selectCriteria("inIcuCurrently") };
-      case "on_ventilator":
-        return { data: selectCriteria("onVentilatorCurrently") };
-      case "daily_tests":
-        return { data: selectCriteria("totalTestResultsIncrease") };
+      case "positiveIncrease":
+        return {
+          field: "positiveIncrease",
+          data: selectCriteria("positiveIncrease"),
+        };
+      case "deathIncrease":
+        return {
+          field: "deathIncrease",
+          data: selectCriteria("deathIncrease"),
+        };
+      case "hospitalizedCurrently":
+        return {
+          field: "hospitalizedCurrently",
+          data: selectCriteria("hospitalizedCurrently"),
+        };
+      case "inIcuCurrently":
+        return {
+          field: "inIcuCurrently",
+          data: selectCriteria("inIcuCurrently"),
+        };
+      case "onVentilatorCurrently":
+        return {
+          field: "onVentilatorCurrently",
+          data: selectCriteria("onVentilatorCurrently"),
+        };
+      case "totalTestResultsIncrease":
+        return {
+          field: "totalTestResultsIncrease",
+          data: selectCriteria("totalTestResultsIncrease"),
+        };
       default:
         throw new Error("Unexpected action", action);
     }
@@ -213,42 +259,42 @@ export default function Home({ dataset }) {
             <div className="flex flex-col lg:flex-row">
               <div className="flex flex-col lg:w-3/4">
                 <div className="flex justify-around flex-wrap">
-                  <button
-                    className="w-1/3 md:w-1/6"
-                    onClick={() => dispatch({ type: "daily_tests" })}
-                  >
-                    Daily Tests
-                  </button>
-                  <button
-                    className="w-1/3 md:w-1/6"
-                    onClick={() => dispatch({ type: "daily_cases" })}
-                  >
-                    Daily Cases
-                  </button>
-                  <button
-                    className="w-1/3 md:w-1/6"
-                    onClick={() => dispatch({ type: "hospitalized" })}
-                  >
-                    Hospitalized
-                  </button>
-                  <button
-                    className="w-1/3 md:w-1/6"
-                    onClick={() => dispatch({ type: "in_ICU" })}
-                  >
-                    in ICU
-                  </button>
-                  <button
-                    className="w-1/3 md:w-1/6"
-                    onClick={() => dispatch({ type: "on_ventilator" })}
-                  >
-                    on Ventilator
-                  </button>
-                  <button
-                    className="w-1/3 md:w-1/6"
-                    onClick={() => dispatch({ type: "daily_death" })}
-                  >
-                    Daily Deaths
-                  </button>
+                  <CriteriaSwitch
+                    text="Daily Tests"
+                    field="totalTestResultsIncrease"
+                    dispatch={dispatch}
+                    state={state}
+                  />
+                  <CriteriaSwitch
+                    text="Daily Cases"
+                    field="positiveIncrease"
+                    dispatch={dispatch}
+                    state={state}
+                  />
+                  <CriteriaSwitch
+                    text="Hospitalized"
+                    field="hospitalizedCurrently"
+                    dispatch={dispatch}
+                    state={state}
+                  />
+                  <CriteriaSwitch
+                    text="in ICU"
+                    field="inIcuCurrently"
+                    dispatch={dispatch}
+                    state={state}
+                  />
+                  <CriteriaSwitch
+                    text="on Ventilator"
+                    field="onVentilatorCurrently"
+                    dispatch={dispatch}
+                    state={state}
+                  />
+                  <CriteriaSwitch
+                    text="Daily Deaths"
+                    field="deathIncrease"
+                    dispatch={dispatch}
+                    state={state}
+                  />
                 </div>
                 <div className="" ref={ref}>
                   <svg width={width} height={height} id="chart" />
