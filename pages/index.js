@@ -46,9 +46,6 @@ const drawLine = ({ width, height, dataset, setDetailed }) => {
     .attr("opacity", "0.4")
     .selectAll("rect")
     .data(dataset)
-    .on("click", (d, i) => {
-      setDetailed(i.date);
-    })
     .join("rect")
     .transition()
     .attr("x", (d) => x(d.date))
@@ -68,6 +65,19 @@ const drawLine = ({ width, height, dataset, setDetailed }) => {
     .attr("fill", "none")
     .transition()
     .attr("d", chartline);
+
+  g("shadow")
+    .attr("opacity", "0.0")
+    .selectAll("rect")
+    .data(dataset)
+    .on("click", (d, i) => {
+      setDetailed(i.date);
+    })
+    .join("rect")
+    .attr("x", (d) => x(d.date))
+    .attr("y", (d) => margin.bottom)
+    .attr("height", y(0) - margin.bottom)
+    .attr("width", bandWidth);
 };
 
 function Details(props) {
