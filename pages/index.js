@@ -8,7 +8,7 @@ import classnames from "classnames";
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 600;
 
-const drawLine = ({ width, height, dataset }) => {
+const drawLine = ({ width, height, dataset, setDetailed }) => {
   const margin = { left: 60, right: 20, top: 30, bottom: 30 };
 
   const element = (type, className) => {
@@ -46,6 +46,9 @@ const drawLine = ({ width, height, dataset }) => {
     .attr("opacity", "0.4")
     .selectAll("rect")
     .data(dataset)
+    .on("click", (d, i) => {
+      setDetailed(i.date);
+    })
     .join("rect")
     .transition()
     .attr("x", (d) => x(d.date))
@@ -71,7 +74,7 @@ function Details(props) {
   return (
     <div>
       <p className="text-center font-semibold text-lg mb-2">
-        {new Date(props.dateChecked).toDateString()}
+        {props.date.toDateString()}
       </p>
 
       <div className="flex flex-col md:flex-row lg:flex-col px-2">
@@ -167,12 +170,12 @@ const CriteriaSwitch = ({ text, field, dispatch, state }) => {
 };
 
 export default function Home({ dataset }) {
+  dataset = dataset.map((d) => ({ ...d, date: new Date(d.dateChecked) }));
+
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [height] = useState(DEFAULT_HEIGHT);
 
   const [ref, bounds] = useMeasure();
-
-  const [current, setCurrent] = useState(dataset[0]);
 
   const selectCriteria = (field) =>
     dataset.map((d, i) => {
@@ -185,7 +188,7 @@ export default function Home({ dataset }) {
           (dataset[dataset.length - 1][field] * (i - dataset.length + 7)) / 7;
       }
       return {
-        date: new Date(d.dateChecked),
+        date: d.date,
         value: d[field],
         avg7,
       };
@@ -194,39 +197,53 @@ export default function Home({ dataset }) {
   const initialState = {
     field: "positiveIncrease",
     data: selectCriteria("positiveIncrease"),
+    detailed: dataset[0],
   };
 
   const criteriaReducer = (state, action) => {
     switch (action.type) {
       case "positiveIncrease":
         return {
+          ...state,
           field: "positiveIncrease",
           data: selectCriteria("positiveIncrease"),
         };
       case "deathIncrease":
         return {
+          ...state,
           field: "deathIncrease",
           data: selectCriteria("deathIncrease"),
         };
       case "hospitalizedCurrently":
         return {
+          ...state,
           field: "hospitalizedCurrently",
           data: selectCriteria("hospitalizedCurrently"),
         };
       case "inIcuCurrently":
         return {
+          ...state,
           field: "inIcuCurrently",
           data: selectCriteria("inIcuCurrently"),
         };
       case "onVentilatorCurrently":
         return {
+          ...state,
           field: "onVentilatorCurrently",
           data: selectCriteria("onVentilatorCurrently"),
         };
       case "totalTestResultsIncrease":
         return {
+          ...state,
           field: "totalTestResultsIncrease",
           data: selectCriteria("totalTestResultsIncrease"),
+        };
+      case "set_detailed":
+        return {
+          ...state,
+          detailed: dataset.find(
+            (d) => d.date.getTime() === action.date.getTime()
+          ),
         };
       default:
         throw new Error("Unexpected action", action);
@@ -235,8 +252,10 @@ export default function Home({ dataset }) {
 
   const [state, dispatch] = useReducer(criteriaReducer, initialState);
 
+  const setDetailed = (date) => dispatch({ type: "set_detailed", date });
+
   useEffect(() => {
-    drawLine({ dataset: state.data, width, height });
+    drawLine({ dataset: state.data, width, height, setDetailed });
   }, [width, height, state]);
 
   useEffect(() => {
@@ -305,7 +324,7 @@ export default function Home({ dataset }) {
                 </div>
               </div>
               <div className="lg:w-1/4 lg:pl-3 mt-5">
-                <Details {...current} />
+                <Details {...state.detailed} />
               </div>
             </div>
           </div>
