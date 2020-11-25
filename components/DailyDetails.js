@@ -1,3 +1,11 @@
+const DataField = ({ label, value }) => {
+  return (
+    <div className="flex justify-between">
+      <p>{label}</p> <p>{value}</p>
+    </div>
+  );
+};
+
 const DailyDetails = (props) => {
   return (
     <div>
@@ -11,26 +19,21 @@ const DailyDetails = (props) => {
             On this day
           </p>
           <div>
-            <div className="flex justify-between">
-              <p>Tests Performed:</p> <p>{props.totalTestResultsIncrease}</p>
-            </div>
-            <div className="flex justify-between">
-              <p>Positive Cases:</p> <p>{props.positiveIncrease}</p>
-            </div>
-            <div className="flex justify-between">
-              <p>Currently Hospitalized:</p>{" "}
-              <p>{props.hospitalizedCurrently}</p>
-            </div>
-            <div className="flex justify-between">
-              <p>Currently in ICU:</p> <p>{props.inIcuCurrently}</p>
-            </div>
-            <div className="flex justify-between">
-              <p>Currently on Ventilator:</p>{" "}
-              <p>{props.onVentilatorCurrently}</p>
-            </div>
-            <div className="flex justify-between">
-              <p>Deaths Increase:</p> <p>{props.deathIncrease}</p>
-            </div>
+            <DataField
+              label="Tests Performed"
+              value={props.totalTestResultsIncrease}
+            />
+            <DataField label="Positive Cases" value={props.positiveIncrease} />
+            <DataField
+              label="Currently Hospitalized"
+              value={props.hospitalizedCurrently}
+            />
+            <DataField label="Currently in ICU" value={props.inIcuCurrently} />
+            <DataField
+              label="Currently on Ventilator"
+              value={props.onVentilatorCurrently}
+            />
+            <DataField label="Deaths Increase" value={props.deathIncrease} />
           </div>
         </div>
 
@@ -39,27 +42,16 @@ const DailyDetails = (props) => {
             By this day cumulative
           </p>
           <div>
-            <div className="flex justify-between">
-              <p>Tests Performed:</p> <p>{props.totalTestResults}</p>
-            </div>
-            <div className="flex justify-between">
-              <p>Positive Cases:</p> <p>{props.positive}</p>
-            </div>
-            <div className="flex justify-between">
-              <p>Hospitalized:</p> <p>{props.hospitalized}</p>
-            </div>
-            <div className="flex justify-between">
-              <p>in ICU:</p> <p>{props.inIcuCumulative}</p>
-            </div>
-            <div className="flex justify-between">
-              <p>on Ventilator:</p> <p>{props.onVentilatorCumulative}</p>
-            </div>
-            <div className="flex justify-between">
-              <p>Total Deaths:</p> <p>{props.death}</p>
-            </div>
-            <div className="flex justify-between">
-              <p>Total Recovered:</p> <p>{props.recovered}</p>
-            </div>
+            <DataField label="Tests Performed" value={props.totalTestResults} />
+            <DataField label="Positive Cases" value={props.positive} />
+            <DataField label="Hospitalized" value={props.hospitalized} />
+            <DataField label="in ICU" value={props.inIcuCumulative} />
+            <DataField
+              label="on Ventilator"
+              value={props.onVentilatorCumulative}
+            />
+            <DataField label="Total Deaths" value={props.death} />
+            <DataField label="Total Recovered" value={props.recovered} />
           </div>
         </div>
       </div>
