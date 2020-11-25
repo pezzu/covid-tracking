@@ -1,7 +1,15 @@
 import Head from "next/head";
 import { useEffect, useState, useReducer } from "react";
 import useMeasure from "react-use-measure";
-import { select, axisBottom, axisLeft, max, line, curveCardinal } from "d3";
+import {
+  select,
+  axisBottom,
+  axisLeft,
+  max,
+  line,
+  curveCardinal,
+  extent,
+} from "d3";
 import { scaleLinear, scaleTime } from "d3-scale";
 import classnames from "classnames";
 
@@ -22,11 +30,12 @@ const drawLine = ({ width, height, dataset, setDetailed }) => {
   const path = (cx) => element("path", cx);
 
   const y = scaleLinear()
-    .domain([0, max(dataset.map((it) => it.value)) * 1.1])
-    .range([height - margin.top, margin.bottom]);
+    .domain([0, max(dataset, (d) => d.value)])
+    .nice()
+    .range([height - margin.bottom, margin.top]);
 
   const x = scaleTime()
-    .domain([dataset[dataset.length - 1].date, dataset[0].date])
+    .domain(extent(dataset, (d) => d.date))
     .range([margin.left, width - margin.right]);
 
   const yAxis = axisLeft().scale(y);
@@ -66,18 +75,18 @@ const drawLine = ({ width, height, dataset, setDetailed }) => {
     .transition()
     .attr("d", chartline);
 
-  g("shadow")
-    .attr("opacity", "0.0")
-    .selectAll("rect")
-    .data(dataset)
-    .on("click", (d, i) => {
-      setDetailed(i.date);
-    })
-    .join("rect")
-    .attr("x", (d) => x(d.date))
-    .attr("y", (d) => margin.bottom)
-    .attr("height", y(0) - margin.bottom)
-    .attr("width", bandWidth);
+   g("shadow")
+     .attr("opacity", "0.0")
+     .selectAll("rect")
+     .data(dataset)
+     .on("click", (d, i) => {
+       setDetailed(i.date);
+     })
+     .join("rect")
+     .attr("x", (d) => x(d.date))
+     .attr("y", margin.bottom)
+     .attr("height", y(0) - margin.bottom)
+     .attr("width", bandWidth);
 };
 
 function Details(props) {
