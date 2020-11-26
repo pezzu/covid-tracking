@@ -6,12 +6,13 @@ const CriteriaSwitch = ({ text, field, dispatch, isActive }) => {
       <button
         className={classnames(
           "w-full",
-          "border",
-          "rounded-lg",
-          "border-gray-800",
+          "border-2",
+          "border-gray-100",
+          "rounded-md",
+          "shadow-md",
           "font-semibold",
-          "hover:bg-gray-500",
-          "hover:text-white",
+          "p-2",
+          "hover:border-gray-700",
           {
             "text-white": isActive,
             "bg-gray-800": isActive,
