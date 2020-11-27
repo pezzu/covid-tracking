@@ -79,7 +79,7 @@ export default function Home({ dataset }) {
                 {dateFormat(dataset[0].dateChecked)}
               </div>
             </div>
-            <div className="lg:w-1/4 lg:pl-3 mt-5">
+            <div className="lg:w-1/4 lg:pl-3 mt-5 pt-2 border-t-2 lg:border-0 lg:border-t-0 lg:pt-0 flex flex-col justify-center">
               <DailyDetails {...state.detailed} />
             </div>
           </main>
