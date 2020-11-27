@@ -65,28 +65,78 @@ export default function Home({ dataset }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
-        <div className="min-w-screen min-h-screen bg-gray-100 text-gray-900 flex flex-wrap content-around justify-center px-3 py-3">
-          <div className="bg-white text-grey-800 rounded shadow-xl py-3 px-3 w-full xl:max-w-6xl">
-            <h1 className="text-center font-semibold text-3xl mb-5 mx-2">
-              COVID-19 in the United States
-            </h1>
-            <div className="flex flex-col lg:flex-row">
-              <div className="flex flex-col lg:w-3/4">
-                <CriteriaSwitchPanel active={state.field} dispatch={dispatch} />
-                <BarChart dataset={state.data} dispatch={dispatch} />
-                <div className="text-center text-xl">
-                  {dateFormat(dataset[dataset.length - 1].dateChecked)} -{" "}
-                  {dateFormat(dataset[0].dateChecked)}
-                </div>
-              </div>
-              <div className="lg:w-1/4 lg:pl-3 mt-5">
-                <DailyDetails {...state.detailed} />
+      <div className="min-w-screen min-h-screen bg-gray-100 text-gray-900 flex flex-wrap content-around justify-center px-3">
+        <div className="bg-white text-grey-800 rounded shadow-xl px-3 w-full xl:max-w-6xl">
+          <header className="text-center font-semibold text-3xl mb-5 mx-2 border-b-2">
+            COVID-19 in the United States
+          </header>
+          <main className="flex flex-col lg:flex-row">
+            <div className="flex flex-col lg:w-3/4">
+              <CriteriaSwitchPanel active={state.field} dispatch={dispatch} />
+              <BarChart dataset={state.data} dispatch={dispatch} />
+              <div className="text-center text-xl">
+                {dateFormat(dataset[dataset.length - 1].dateChecked)} -{" "}
+                {dateFormat(dataset[0].dateChecked)}
               </div>
             </div>
-          </div>
+            <div className="lg:w-1/4 lg:pl-3 mt-5">
+              <DailyDetails {...state.detailed} />
+            </div>
+          </main>
+          <footer className="mt-4 border-t-2 text-center py-2">
+            <div className="flex flex-wrap justify-evenly">
+              <div className="w-full md:w-1/2 flex flex-row justify-evenly">
+                <a
+                  href="https://github.com/pezzu/covid-tracking/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    className="h-8 w-16"
+                    src="/github.svg"
+                    alt="Github Logo"
+                  />
+                </a>
+                <a
+                  href="https://covidtracking.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    className="h-8 w-25"
+                    src="/covidtracking.svg"
+                    alt="The Covid Tracking Project Logo"
+                  />
+                </a>
+              </div>
+              <div className="w-full md:w-1/2 flex flex-row justify-evenly">
+                <a
+                  href="https://nextjs.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    className="h-8 w-20"
+                    src="/nextjs.svg"
+                    alt="Next.js Logo"
+                  />
+                </a>
+                <a
+                  href="https://vercel.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    className="h-8 w-20"
+                    src="/vercel.svg"
+                    alt="Vercel Logo"
+                  />
+                </a>
+              </div>
+            </div>
+          </footer>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

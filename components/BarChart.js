@@ -15,7 +15,7 @@ const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 600;
 
 const drawChart = ({ width, height, dataset, setDetailed }) => {
-  const margin = { left: 60, right: 20, top: 30, bottom: 30 };
+  const margin = { left: 60, right: 0, top: 30, bottom: 30 };
 
   const element = (type, className) => {
     const elem = select(`.${className}`);
