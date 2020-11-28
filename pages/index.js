@@ -68,8 +68,8 @@ export default function Home({ dataset }) {
       </Head>
 
       <div className="min-w-screen min-h-screen bg-gray-100 text-gray-900 flex flex-wrap content-around justify-center px-3">
-        <div className="bg-white text-grey-800 rounded shadow-xl px-3 w-full xl:max-w-6xl">
-          <header className="text-center font-semibold text-3xl mb-5 mx-2 border-b-2">
+        <div className="bg-white text-grey-800 rounded shadow-xl px-3 py-3 w-full xl:max-w-6xl">
+          <header className="text-center font-semibold text-3xl mb-8 mx-2 py-3 border-b-2">
             COVID-19 in the United States
           </header>
           <main className="flex flex-col lg:flex-row">
@@ -87,9 +87,10 @@ export default function Home({ dataset }) {
               <DailyDetails {...state.detailed} />
             </div>
           </main>
-          <footer className="mt-4 border-t-2 text-center py-2">
+          <footer className="mt-10 border-t-2 text-center py-3">
             <div className="flex flex-wrap justify-evenly">
-              <div className="w-full md:w-1/2 flex flex-row justify-evenly">
+              <div className="w-full text-sm font-semibold text-gray-600 mb-3">Powered by</div>
+              <div className="w-full md:w-1/2 flex flex-row justify-evenly p-2">
                 <a
                   href="https://github.com/pezzu/covid-tracking/"
                   target="_blank"
@@ -113,7 +114,7 @@ export default function Home({ dataset }) {
                   />
                 </a>
               </div>
-              <div className="w-full md:w-1/2 flex flex-row justify-evenly">
+              <div className="w-full md:w-1/2 flex flex-row justify-evenly p-2">
                 <a
                   href="https://nextjs.org/"
                   target="_blank"

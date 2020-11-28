@@ -15,7 +15,7 @@ const DailyDetails = (props) => {
 
       <div className="flex flex-col md:flex-row lg:flex-col px-2">
         <div className="md:w-1/2 lg:w-full px-2">
-          <p className="border-gray-400 border-b-2 font-semibold mt-4 mb-2 text-right">
+          <p className="border-gray-400 border-b-2 border-dotted font-semibold mt-4 mb-2 text-right">
             On this day
           </p>
           <div>
@@ -38,7 +38,7 @@ const DailyDetails = (props) => {
         </div>
 
         <div className="md:w-1/2 lg:w-full px-2">
-          <p className="border-gray-400 border-b-2 font-semibold mt-4 mb-2 text-right">
+          <p className="border-gray-400 border-b-2 border-dotted font-semibold mt-4 mb-2 text-right">
             By this day cumulative
           </p>
           <div>
