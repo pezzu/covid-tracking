@@ -1,6 +1,11 @@
 import classnames from "classnames";
+import { useContext } from "react";
 
-const CriteriaSwitch = ({ text, field, dispatch, isActive }) => {
+import { ChartContext } from "../app/chart-context";
+
+const CriteriaSwitch = ({ text, field, isActive }) => {
+  const dispatch = useContext(ChartContext);
+
   return (
     <div className="p-1 w-1/3 md:w-1/6">
       <button
@@ -28,44 +33,38 @@ const CriteriaSwitch = ({ text, field, dispatch, isActive }) => {
   );
 };
 
-const CriteriaSwitchPanel = ({dispatch, active}) => {
+const CriteriaSwitchPanel = ({ active }) => {
   return (
     <div className="flex justify-around flex-wrap">
       <CriteriaSwitch
         text="Daily Tests"
         field="totalTestResultsIncrease"
         isActive={"totalTestResultsIncrease" === active}
-        dispatch={dispatch}
       />
       <CriteriaSwitch
         text="Daily Cases"
         field="positiveIncrease"
         isActive={"positiveIncrease" === active}
-        dispatch={dispatch}
       />
       <CriteriaSwitch
         text="Hospitalized"
         field="hospitalizedCurrently"
         isActive={"hospitalizedCurrently" === active}
-        dispatch={dispatch}
       />
       <CriteriaSwitch
         text="in ICU"
         field="inIcuCurrently"
         isActive={"inIcuCurrently" === active}
-        dispatch={dispatch}
       />
       <CriteriaSwitch
         text="on Ventilator"
         field="onVentilatorCurrently"
         isActive={"onVentilatorCurrently" === active}
-        dispatch={dispatch}
       />
       <CriteriaSwitch
         text="Daily Deaths"
         field="deathIncrease"
         isActive={"deathIncrease" === active}
-        dispatch={dispatch}
       />
     </div>
   );

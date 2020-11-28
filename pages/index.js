@@ -5,6 +5,8 @@ import BarChart from "../components/BarChart";
 import CriteriaSwitchPanel from "../components/CriteriaSwitch";
 import DailyDetails from "../components/DailyDetails";
 
+import { ChartContext } from "../app/chart-context";
+
 const dateFormat = (dateStr) => {
   const date = new Date(dateStr);
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
@@ -72,8 +74,10 @@ export default function Home({ dataset }) {
           </header>
           <main className="flex flex-col lg:flex-row">
             <div className="flex flex-col lg:w-3/4">
-              <CriteriaSwitchPanel active={state.field} dispatch={dispatch} />
-              <BarChart dataset={state.data} dispatch={dispatch} />
+              <ChartContext.Provider value={dispatch}>
+                <CriteriaSwitchPanel active={state.field} />
+                <BarChart dataset={state.data} />
+              </ChartContext.Provider>
               <div className="text-center text-xl">
                 {dateFormat(dataset[dataset.length - 1].dateChecked)} -{" "}
                 {dateFormat(dataset[0].dateChecked)}
