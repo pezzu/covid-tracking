@@ -8,6 +8,9 @@ import {
   line,
   curveCardinal,
   extent,
+  timeFormat,
+  timeYear,
+  format,
 } from "d3";
 import { scaleLinear, scaleTime } from "d3-scale";
 
@@ -15,7 +18,7 @@ const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 600;
 
 const drawChart = ({ width, height, dataset, setDetailed }) => {
-  const margin = { left: 60, right: 0, top: 30, bottom: 30 };
+  const margin = { left: 40, right: 0, top: 30, bottom: 30 };
 
   const element = (type, className) => {
     const elem = select(`.${className}`);
@@ -36,8 +39,14 @@ const drawChart = ({ width, height, dataset, setDetailed }) => {
     .domain(extent(dataset, (d) => d.date))
     .range([margin.left, width - margin.right]);
 
-  const yAxis = axisLeft().scale(y);
-  const xAxis = axisBottom().scale(x);
+  const yAxis = axisLeft()
+    .scale(y)
+    .tickFormat((amount) => format("~s")(amount));
+  const xAxis = axisBottom()
+    .scale(x)
+    .tickFormat((date) =>
+      timeYear(date) < date ? timeFormat("%b")(date) : timeFormat("%Y")(date)
+    );
 
   g("y-axis")
     .transition()
