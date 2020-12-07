@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import useMeasure from "react-use-measure";
 import {
   select,
@@ -13,6 +13,8 @@ import {
   format,
 } from "d3";
 import { scaleLinear, scaleTime } from "d3-scale";
+
+import { ChartContext } from "../app/chart-context";
 
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 600;
@@ -96,11 +98,13 @@ const drawChart = ({ width, height, dataset, setDetailed }) => {
     .attr("width", bandWidth);
 };
 
-const BarChart = ({ dataset, dispatch }) => {
+const BarChart = ({ dataset }) => {
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [height] = useState(DEFAULT_HEIGHT);
 
   const [ref, bounds] = useMeasure();
+
+  const dispatch = useContext(ChartContext);
 
   const setDetailed = (date) => dispatch({ type: "set_detailed", date });
 
